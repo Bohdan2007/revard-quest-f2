@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Термінал доступу F2</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: clamp(10px, 4vmin, 20px);
+            box-sizing: border-box;
+            overflow: hidden; /* Щоб феєрверки не створювали скрол */
+        }
+        
+        /* Екран логіну */
+        #login-screen {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: clamp(6px, 2vmin, 12px);
+            padding: clamp(20px, 6vmin, 40px);
+            width: 100%;
+            max-width: clamp(280px, 90vw, 450px);
+            text-align: center;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.1);
+        }
+
+        /* Екран успіху (спочатку прихований) */
+        #success-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10; /* Щоб текст був над феєрверками */
+            padding: clamp(10px, 5vw, 20px);
+        }
+
+        h2 {
+            color: #58a6ff;
+            font-size: clamp(20px, 6vmin, 28px);
+            margin-top: 0;
+            border-bottom: 1px dashed #30363d;
+            padding-bottom: clamp(10px, 3vmin, 20px);
+        }
+
+        p {
+            font-size: clamp(14px, 4vmin, 16px);
+        }
+
+        .success-title {
+            color: #7ee787;
+            font-size: clamp(30px, 8vmin, 46px);
+            font-weight: bold;
+            margin-bottom: clamp(10px, 3vmin, 20px);
+            text-shadow: 0 0 15px rgba(126, 231, 135, 0.5);
+        }
+
+        .success-subtitle {
+            font-size: clamp(16px, 5vmin, 22px);
+            color: #c9d1d9;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: clamp(12px, 4vmin, 18px);
+            margin: clamp(15px, 4vmin, 25px) 0;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #7ee787;
+            font-size: clamp(18px, 5.5vmin, 24px);
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            border-radius: clamp(4px, 1.5vmin, 8px);
+            box-sizing: border-box;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        input[type="text"]:focus {
+            border-color: #58a6ff;
+        }
+
+        button {
+            width: 100%;
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: clamp(12px, 4vmin, 18px);
+            font-size: clamp(16px, 5vmin, 20px);
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+            border-radius: clamp(4px, 1.5vmin, 8px);
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2ea043;
+        }
+
+        #message {
+            margin-top: clamp(15px, 4vmin, 25px);
+            font-size: clamp(14px, 4.5vmin, 18px);
+            font-weight: bold;
+            min-height: clamp(40px, 10vmin, 55px);
+            color: #ff7b72; /* Колір помилки */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2>>> Системний шлюз</h2>
+        <p>Введіть зібраний алгоритм для отримання доступу:</p>
+        
+        <input type="text" id="passwordInput" placeholder="Введіть код..." autocomplete="off">
+        <button id="checkButton">ІНІЦІАЛІЗАЦІЯ</button>
+        
+        <div id="message"></div>
+    </div>
+
+    <div id="success-screen">
+        <div class="success-title">ВИ СПРАВИЛИСЯ!</div>
+        <div class="success-subtitle">Доступ відкрито. Покажіть цей екран волонтеру!</div>
+    </div>
+
+    <script>
+        const button = document.getElementById('checkButton');
+        const input = document.getElementById('passwordInput');
+        const message = document.getElementById('message');
+        const loginScreen = document.getElementById('login-screen');
+        const successScreen = document.getElementById('success-screen');
+
+        // Функція для запуску крутих феєрверків
+        function launchFireworks() {
+            var duration = 5 * 1000; // Феєрверки йтимуть 5 секунд
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // Запускаємо конфетті з двох боків екрана
+                confetti(Object.assign({}, defaults, { particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, { particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        }
+
+        function checkPassword() {
+            const password = input.value.trim().toUpperCase();
+
+            if (password === "ПЗКС_F2" || password === "ПЗKC_F2") {
+                // Якщо правильно: ховаємо логін, показуємо успіх, запускаємо салют
+                loginScreen.style.display = 'none';
+                successScreen.style.display = 'flex';
+                launchFireworks();
+            } else {
+                // Якщо помилка: показуємо повідомлення
+                message.textContent = "Неправильний пароль! Попробуйте знову.";
+                input.style.borderColor = "#ff7b72";
+                
+                // Легка анімація "трусіння" поля вводу при помилці (у % для адаптивності)
+                input.style.transform = "translateX(-3%)";
+                setTimeout(() => input.style.transform = "translateX(3%)", 50);
+                setTimeout(() => input.style.transform = "translateX(-3%)", 100);
+                setTimeout(() => input.style.transform = "translateX(0)", 150);
+            }
+        }
+
+        button.addEventListener('click', checkPassword);
+
+        input.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
+
+</body>
+</html>
